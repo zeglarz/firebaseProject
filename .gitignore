@@ -66,4 +66,4 @@ node_modules/
 
 
 .idea
-*.admin_keys.json
+admin_keys.json
