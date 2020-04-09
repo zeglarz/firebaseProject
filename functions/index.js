@@ -57,7 +57,8 @@ app.post('/signup', (req, res) => {
     };
 
     // TODO validate data
-    db.doc(`/user/${newUser.handle}`).get()
+    let storedToken, userId;
+    db.doc(`/users/${newUser.handle}`).get()
         .then(doc => {
             if (doc.exists) {
                 return res.status(400).json({ handle: 'this handle is already taken' });
@@ -67,10 +68,26 @@ app.post('/signup', (req, res) => {
                     .createUserWithEmailAndPassword(newUser.email, newUser.password);
             }
         })
-        .then(data => data.user.getIdToken())
-        .then(token => res.json(201).json({ token }))
+        .then(data => {
+            userId = data.user.uid;
+            return data.user.getIdToken();
+        })
+        .then(token => {
+            storedToken = token;
+            const userCredentials = {
+                handle: newUser.handle,
+                email: newUser.email,
+                createdAt: new Date().toISOString(),
+                userId
+            };
+            return db.doc(`/users/${newUser.handle}`).set(userCredentials);
+        })
+        .then(() => res.status(201).json({ storedToken }))
         .catch(err => {
             console.error(err);
+            if (err.code === 'auth/email-already-in-use') {
+                return res.status(400).json({ error: 'email already in use' });
+            }
             return res.status(500).json({ error: err.code });
         });
 });
