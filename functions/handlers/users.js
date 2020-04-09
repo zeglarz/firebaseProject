@@ -97,7 +97,7 @@ exports.uploadImage = (req, res) => {
         imageToBeUploaded = { filepath, mimetype };
         file.pipe(fs.createWriteStream(filepath));
     });
-    busboy.one('finish', () => {
+    busboy.on('finish', () => {
         admin.storage().bucket().upload(imageToBeUploaded.filepath, {
             resumable: false,
             metadata: {
@@ -116,4 +116,5 @@ exports.uploadImage = (req, res) => {
                 return res.json({ error: error.code });
             });
     });
+    busboy.end(req.rawBody);
 };
