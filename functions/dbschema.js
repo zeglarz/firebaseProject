@@ -20,9 +20,16 @@ let db = {
             likeCount: 5,
             commentCount: 2
         }
+    ],
+    comments: [
+        {
+            userHandle: 'user',
+            screamId: 'kjdsfsdfsdfsdf',
+            body: 'hello everyone!',
+            createdAt: '2020-04-08T16:47:42.170Z'
+        }
     ]
 };
-
 const userDetails = {
     // Redux data
     credentials: {
