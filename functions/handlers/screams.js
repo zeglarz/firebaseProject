@@ -55,7 +55,6 @@ exports.getScream = (req, res) => {
                 .get();
         })
         .then(data => {
-            console.log(screamData);
             screamData.comments = [];
             data.forEach(doc => {
                 screamData.comments.push(doc.data());
@@ -83,7 +82,6 @@ exports.commentOnScream = (req, res) => {
 
     db.doc(`screams/${req.params.screamId}`).get()
         .then(doc => {
-            console.log(newComment);
             if (!doc.exists) {
                 return res.status(404).json({ error: 'Scream not fount' });
             }
@@ -158,7 +156,6 @@ exports.unlikeScream = (req, res) => {
             }
         })
         .then(data => {
-            console.log(data.docs[0].id);
             if (!data.empty) {
                 return db.doc(`/likes/${data.docs[0].id}`).delete()
                     .then(() => {
