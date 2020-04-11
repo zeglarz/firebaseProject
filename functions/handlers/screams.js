@@ -179,16 +179,17 @@ exports.unlikeScream = (req, res) => {
 // Delete scream
 exports.deleteScream = (req, res) => {
     const document = db.doc(`screams/${req.params.screamId}`);
-    document.get(doc => {
-        if (!doc.exists) {
-            return res.status(404).json({ error: 'Scream not fount' });
-        }
-        if (doc.data().userHandle !== req.user.handle) {
-            return res.statu(403).json({ error: 'Unauthorized' });
-        } else {
-            return document.delete();
-        }
-    })
+    document.get()
+        .then(doc => {
+            if (!doc.exists) {
+                return res.status(404).json({ error: 'Scream not fount' });
+            }
+            if (doc.data().userHandle !== req.user.handle) {
+                return res.statu(403).json({ error: 'Unauthorized' });
+            } else {
+                return document.delete();
+            }
+        })
         .then(() => {
             return res.json({ message: 'Scream deleted successfully' });
         })
