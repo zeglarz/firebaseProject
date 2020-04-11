@@ -81,7 +81,7 @@ exports.commentOnScream = (req, res) => {
         userImage: req.user.imageUrl
     };
 
-    db.doc(`/screams/${req.params.screamId}`).get()
+    db.doc(`screams/${req.params.screamId}`).get()
         .then(doc => {
             console.log(newComment);
             if (!doc.exists) {
@@ -100,9 +100,9 @@ exports.commentOnScream = (req, res) => {
 
 // Like a scream
 exports.likeScream = (req, res) => {
-    const likeDocument = db.collection('/likes').where('userHandle', '==', req.user.handle)
+    const likeDocument = db.collection('likes').where('userHandle', '==', req.user.handle)
         .where('screamId', '==', req.params.screamId).limit(1);
-    const screamDocument = db.collection(`/screams/${req.params.screamId}`);
+    const screamDocument = db.doc(`screams/${req.params.screamId}`);
     const newLike = {
         screamId: req.params.screamId,
         userHandle: req.user.handle
