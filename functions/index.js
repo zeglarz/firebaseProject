@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const app = require('express')();
 
 const { getAllScreams, postOneScream, getScream, commentOnScream, likeScream, unlikeScream, deleteScream } = require('./handlers/screams');
-const { signup, login, uploadImage, addUserDetails, getAuthenticatedUser } = require('./handlers/users');
+const { signup, login, uploadImage, addUserDetails, getAuthenticatedUser, getUserDetails, markNotificationsRead  } = require('./handlers/users');
 const FBAuth = require('./util/auth');
 const { db } = require('./util/admin');
 // Scream routes
@@ -18,6 +18,8 @@ app.post('/scream/:screamId/comment', FBAuth, commentOnScream);
 app.post('/user/image', FBAuth, uploadImage);
 app.post('/user', FBAuth, addUserDetails);
 app.get('/user', FBAuth, getAuthenticatedUser);
+app.get('/user/:handle', getUserDetails);
+app.post('/notifications', FBAuth, markNotificationsRead);
 
 
 // Auth routes
@@ -27,13 +29,13 @@ app.post('/login', login);
 exports.api = functions.region('us-east1').https.onRequest(app);
 
 exports.createNotificationOnLike = functions
-    .region('europe-west1')
+    .region('us-east1')
     .firestore.document('likes/{id}')
-    .onCreate((snapshot) => {
+    .onCreate(snapshot => {
         return db
             .doc(`/screams/${snapshot.data().screamId}`)
             .get()
-            .then((doc) => {
+            .then(doc => {
                 if (
                     doc.exists &&
                     doc.data().userHandle !== snapshot.data().userHandle
@@ -53,25 +55,25 @@ exports.createNotificationOnLike = functions
             .catch((err) => console.error(err));
     });
 exports.deleteNotificationOnUnLike = functions
-    .region('europe-west1')
+    .region('us-east1')
     .firestore.document('likes/{id}')
-    .onDelete((snapshot) => {
+    .onDelete(snapshot => {
         return db
             .doc(`/notifications/${snapshot.id}`)
             .delete()
-            .catch((err) => {
+            .catch(err => {
                 console.error(err);
-                return;
+                return null;
             });
     });
 exports.createNotificationOnComment = functions
-    .region('europe-west1')
+    .region('us-east1')
     .firestore.document('comments/{id}')
-    .onCreate((snapshot) => {
+    .onCreate(snapshot => {
         return db
             .doc(`/screams/${snapshot.data().screamId}`)
             .get()
-            .then((doc) => {
+            .then(doc => {
                 if (
                     doc.exists &&
                     doc.data().userHandle !== snapshot.data().userHandle
@@ -87,7 +89,7 @@ exports.createNotificationOnComment = functions
                 }
                 throw new Error;
             })
-            .catch((err) => {
+            .catch(err => {
                 console.error(err);
                 return null;
             });
