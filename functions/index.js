@@ -26,6 +26,21 @@ app.post('/login', login);
 
 exports.api = functions.region('us-east1').https.onRequest(app);
 
+
+exports.deleteNotificationOnUlinke = functions.region('us-east1').firestore.document('likes/{id}')
+    .onDelete(snapshot => {
+        db.doc(`notifications/${snapshot.id}`)
+            .delete()
+            .then(() => {
+                return;
+            })
+            .catch(err => {
+                console.error(err);
+                return;
+            });
+    });
+
+
 exports.createNotificationOnLike = functions.region('us-east1').firestore.document('likes/{id}')
     .onCreate(snapshot => {
         db.doc(`/screams/${snapshot.data.screamId}`).get()
@@ -39,10 +54,11 @@ exports.createNotificationOnLike = functions.region('us-east1').firestore.docume
                         screamId: doc.id
                     });
                 }
+                throw Error;
             })
             .catch(err => {
                 console.error(err);
-                return;
+                return null;
             });
     });
 
@@ -59,10 +75,11 @@ exports.createNotificationOnComment = functions.region('us-east1').firestore.doc
                         screamId: doc.id
                     });
                 }
+                throw Error;
             })
             .catch(err => {
                 console.error(err);
-                return;
+                return null;
             });
     });
 

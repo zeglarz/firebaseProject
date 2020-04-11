@@ -75,7 +75,7 @@ exports.login = (req, res) => {
         .then(token => res.json({ token }))
         .catch(err => {
             console.error(err);
-            if (err.code === 'auth/user-not-found' || 'auth/wrong-password') {
+            if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
                 return res.status(403).json({ error: 'invalid credentials' });
             }
             return res.status(500).json({ error: err.code });
@@ -151,6 +151,7 @@ exports.getAuthenticatedUser = (req, res) => {
                 userData.credentials = doc.data();
                 return db.collection('likes').where('userHandle', '==', req.user.handle).get();
             }
+            throw Error;
         })
         .then(data => {
             userData.likes = [];
