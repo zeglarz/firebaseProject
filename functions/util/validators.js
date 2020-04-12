@@ -32,7 +32,7 @@ exports.validateLoginData = (data) => {
 
     return {
         errors,
-        valid: Object.keys(errors).length === 0 ? true : false
+        valid: Object.keys(errors).length === 0
     };
 };
 
