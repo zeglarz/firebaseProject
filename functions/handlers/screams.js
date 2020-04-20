@@ -22,6 +22,9 @@ exports.getAllScreams = (req, res) => {
 };
 
 exports.postOneScream = (req, res) => {
+    if (req.body.body.trim() === '') {
+        return res.status(400).json({ body: 'Body must not be empty' });
+    }
     const newScream = {
         body: req.body.body,
         userHandle: req.user.handle,
@@ -30,12 +33,13 @@ exports.postOneScream = (req, res) => {
         likeCount: 0,
         commentCount: 0
     };
-    db
+    return db
         .collection('screams')
         .add(newScream)
         .then(doc => {
-            newScream.screamId = doc.id;
-            return res.json({ message: `document ${doc.id} created successfully` });
+            const resScream = newScream;
+            resScream.screamId = doc.id;
+            return res.json(resScream);
         })
         .catch(err => res.status(500).json({ error: `there was a following error ${err}` }));
 };
